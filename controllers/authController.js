@@ -4,8 +4,8 @@ const User = require('../models/userModel');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
 
-exports.signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+exports.signTokenAndSend = (id, res, statusCode) => {
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
   const cookieOptions = {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXP_IN * 24 * 60 * 60 * 1000),
@@ -15,6 +15,12 @@ exports.signToken = (id) => {
   // If node evirnoment is prod then set the secure to true (it uses https)
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = 'true';
   res.cookie('jwt', token, cookieOptions);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'You are logged in!',
+    token,
+  });
 };
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -29,13 +35,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   if (user.active === 'false') user.active === 'true';
 
-  const token = this.signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    message: 'You are logged in!',
-    token,
-  });
+  this.signTokenAndSend(user._id, res, 200);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {

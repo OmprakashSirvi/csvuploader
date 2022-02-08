@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
-const { signToken } = require('./authController');
+const { signTokenAndSend } = require('./authController');
 
 exports.addUsers = (req, res, next) => {
   const file = fast_csv.parseFile(req.file.path, { headers: true });
@@ -16,13 +16,7 @@ exports.addUsers = (req, res, next) => {
       if (!Object.values(doc).includes('')) {
         const newUser = await User.create(doc);
 
-        const token = signToken(newUser._id);
-
-        res.status(200).json({
-          status: 'success',
-          token,
-          data: { newUser },
-        });
+        signTokenAndSend(newUser._id, res, 200);
       } else res.status(500).json({ status: 'fail', message: 'something went wrong' });
     } catch (err) {
       next(new AppError(err.message, 404));

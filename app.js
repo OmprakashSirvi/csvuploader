@@ -24,7 +24,9 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
+  // res.status(200);
 });
+
 app.use('/user', userRoutes);
 
 app.all('*', (req, res, next) => {
