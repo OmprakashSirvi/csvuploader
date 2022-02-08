@@ -8,10 +8,7 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 mongoose
   .connect(DB, {})
@@ -26,10 +23,14 @@ mongoose
   });
 
 const port = process.env.PORT || 8080;
-const host = '127.0.0.1';
-const server = app.listen(port, host, () => {
-  console.log(`App is up and running at : http://${host}:${port}`);
+
+const server = app.listen(port, () => {
+  console.log(`App running on port ${port}...`);
 });
+// const host = '127.0.0.1';
+// const server = app.listen(port, host, () => {
+//   console.log(`App is up and running at : http://${host}:${port}`);
+// });
 
 process.on('unhandledRejection', (err) => {
   console.log(err.name, err.message);
