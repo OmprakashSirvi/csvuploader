@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const userRoutes = require('./routes/userRoutes');
 const AppError = require('./utils/AppError');
 const globalErrorHandler = require('./controllers/errorController');
+const res = require('express/lib/response');
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,6 +22,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 app.use('/user', userRoutes);
 
 app.all('*', (req, res, next) => {
