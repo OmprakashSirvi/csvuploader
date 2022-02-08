@@ -6,6 +6,15 @@ const catchAsync = require('../utils/catchAsync');
 
 exports.signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXP_IN * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+
+  // If node evirnoment is prod then set the secure to true (it uses https)
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = 'true';
+  res.cookie('jwt', token, cookieOptions);
 };
 
 exports.login = catchAsync(async (req, res, next) => {
