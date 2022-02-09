@@ -4,6 +4,16 @@ const User = require('../models/userModel');
 const AppError = require('../utils/AppError');
 const catchAsync = require('../utils/catchAsync');
 
+/**
+ * 
+ * @param {signTokenAndSend} id 
+ * @param {*} res 
+ * @param {*} statusCode 
+ * Function does what its name says.
+ * Cookies are also sent here
+ * 
+ * For production : secure else for dev : http
+ */
 exports.signTokenAndSend = (id, res, statusCode) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
@@ -23,6 +33,10 @@ exports.signTokenAndSend = (id, res, statusCode) => {
   });
 };
 
+/**
+ * Checks the password and logs in the user if it matches
+ * or else create a new AppError and send error
+ */
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -38,6 +52,12 @@ exports.login = catchAsync(async (req, res, next) => {
   this.signTokenAndSend(user._id, res, 200);
 });
 
+/**
+ * Protect route
+ * Checks the JWTtoken
+ * Also checks if the user still exists or not (if the user has deleted his/her account and is trying to login after deletion)
+ * Check if password is changed after issuing the token
+ */
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
   // Get the token and check if it exists..

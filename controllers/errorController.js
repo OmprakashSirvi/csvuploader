@@ -17,10 +17,13 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 404);
 };
 
+// If token is modified in between the server and client
 const handleJWTError = () => new AppError('Invalid token, dont mess with servers..', 401);
 
+// Tf token is expired
 const handleJWTExpError = () => new AppError('Session Expired, login again to continue', 401);
 
+// Send all the error stack, message everything in development
 const sendErrDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -30,6 +33,7 @@ const sendErrDev = (err, res) => {
   });
 };
 
+// If somethong went wrong in production
 const sendProdErr = (err, res) => {
   // Operationl err, this is sent to the client
   if (err.isOperational) {
@@ -48,7 +52,15 @@ const sendProdErr = (err, res) => {
     });
   }
 };
-
+/**
+ * 
+ * @param {GlobalErrorHandler} err 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * Global express error handling middleware..
+ * 
+ */
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
